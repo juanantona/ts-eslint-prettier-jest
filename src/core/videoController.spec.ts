@@ -58,6 +58,24 @@ describe('When the sensor works as expected', () => {
 			jest.advanceTimersByTime(1000);
 			expect(videoRecorder.isRecording).toBe(true);
 		});
+
+		it('Should check sensor every second', async () => {
+			jest.useFakeTimers();
+			const { VideoController } = await import('./videoController');
+			const motionSensor = new MotionSensorStub(true);
+			const videoRecorder = new VideoRecorderSpy();
+			const videoController = new VideoController(videoRecorder, motionSensor);
+
+			videoController.checkSensor = jest.fn(videoController.checkSensor);
+
+			videoController.start();
+			jest.advanceTimersByTime(1000);
+			expect(videoController.checkSensor).toHaveBeenCalledTimes(1);
+			jest.advanceTimersByTime(1000);
+			expect(videoController.checkSensor).toHaveBeenCalledTimes(2);
+			jest.advanceTimersByTime(1000);
+			expect(videoController.checkSensor).toHaveBeenCalledTimes(3);
+		});
 	});
 });
 
