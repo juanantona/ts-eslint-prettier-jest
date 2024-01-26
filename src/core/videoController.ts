@@ -10,7 +10,6 @@ export interface VideoRecorder {
 export class VideoController {
 	private videoRecorder: VideoRecorder;
 	private motionSensor: MotionSensor;
-	private thereIsMovement: boolean;
 	private frecuency: number = 1000;
 	private startProcessId: NodeJS.Timeout;
 
@@ -19,28 +18,16 @@ export class VideoController {
 		this.motionSensor = motionSensor;
 	}
 
-	checkSensor() {
+	recordMotion() {
 		try {
-			this.thereIsMovement = this.motionSensor.isDetectingMotion();
+			this.motionSensor.isDetectingMotion() ? this.videoRecorder.startRecording() : this.videoRecorder.stopRecording();
 		} catch {
 			this.videoRecorder.stopRecording();
 		}
 	}
 
-	operateVideoRecording() {
-		if (this.thereIsMovement) {
-			this.videoRecorder.startRecording();
-		} else {
-			this.videoRecorder.stopRecording();
-		}
-	}
-
 	start() {
-		function callback() {
-			this.checkSensor();
-			this.operateVideoRecording();
-		}
-		this.startProcessId = setInterval(callback.bind(this), this.frecuency);
+		this.startProcessId = setInterval(this.recordMotion.bind(this), this.frecuency);
 	}
 
 	stop() {
