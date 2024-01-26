@@ -48,4 +48,18 @@ describe('When the sensor works as expected', () => {
 			expect(videoRecorder.startRecording).toHaveBeenCalled();
 		});
 	});
+
+	describe('When the sensor throws an error', () => {
+		it('Should stop recording', async () => {
+			const stubSensor = jest.spyOn(motionSensor, 'isDetectingMotion');
+			stubSensor.mockImplementation(() => {
+				throw new Error('Unexpected');
+			});
+			jest.spyOn(videoRecorder, 'stopRecording');
+
+			videoController.recordMotion();
+
+			expect(videoRecorder.stopRecording).toHaveBeenCalled();
+		});
+	});
 });
